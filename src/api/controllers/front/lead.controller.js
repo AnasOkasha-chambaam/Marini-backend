@@ -308,7 +308,7 @@ exports.delete = async (req, res, next) => {
       });
       const lead = await Lead.destroy({ where: { id: id } });
 
-      await Activity.create({ action: "new lead deleted", name: req.body.Uname, role: req.body.role });
+      await Activity.create({ action: "new lead deleted", name: "superAdmin", role: "samon" });
 
       if (lead)
         return res.send({

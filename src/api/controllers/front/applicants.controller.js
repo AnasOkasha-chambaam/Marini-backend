@@ -330,7 +330,7 @@ exports.delete = async (req, res, next) => {
       });
       const applicant = await Applicants.destroy({ where: { id: id } });
 
-      await Activity.create({ action: "applicant deleted", name: req.body.Uname, role: req.body.role });
+      await Activity.create({ action: "applicant deleted", name: "superAdmin", role: "samon" });
 
       if (applicant)
         return res.send({

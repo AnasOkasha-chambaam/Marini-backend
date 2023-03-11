@@ -102,7 +102,7 @@ exports.delete = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       const branch = await Branch.destroy({ where: { id: id } });
-      await Activity.create({ action: "Branch deleted", name: req.body.Uname, role: req.body.role });
+      await Activity.create({ action: "Branch deleted", name: "superAdmin", role: "samon" });
 
       if (branch)
         return res.send({
@@ -128,7 +128,7 @@ exports.delete = async (req, res, next) => {
 exports.get = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (id) {
+    if (id != "undefined") {
       const branch = await Branch.findByPk(id);
 
       if (branch)
@@ -142,10 +142,14 @@ exports.get = async (req, res, next) => {
           success: false,
           message: "branch not found for given Id",
         });
-    } else
+    } else {
+
+      const branch = await Branch.findAll({});
+
       return res
-        .status(400)
-        .send({ success: false, message: "branch Id is required" });
+        .send({ success: true, branch});
+    }
+      
   } catch (error) {
     return next(error);
   }

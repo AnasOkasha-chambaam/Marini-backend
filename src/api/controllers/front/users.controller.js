@@ -81,7 +81,10 @@ exports.list = async (req, res, next) => {
 exports.edit = async (req, res, next) => {
   try {
     let payload = req.body;
-    console.log("1223213123", payload);
+    if (req.file) {
+      const image = req?.file?.filename;
+      payload[`image`] = image;
+    }
     payload.password = bcrypt.hashSync(req.body.password, 10);
     const user = await Users.update(
       // Values to update
@@ -112,7 +115,7 @@ exports.delete = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       const user = await Users.destroy({ where: { id: id } });
-      await Activity.create({ action: "User deleted", name: payload.Uname, role: payload.role });
+      await Activity.create({ action: "User deleted", name: "superAdmin", role: "samon" });
 
       if (user)
         return res.send({
@@ -312,4 +315,58 @@ exports.search = async (req, res, next) => {
     res.send("User  Error " + err);
   }
 }
+
+exports.getUser = async (req, res) => {
+  try {
+    if (req.body.state == 0) {
+      const user = await Users.findOne({
+        where: {
+          name: req.body.name,
+          role: req.body.role
+        },
+      });
+
+      return res.status(200).send({
+        ...user
+      });
+    } else {
+      const lead = await Lead.findOne({
+        where: {
+          email: req.body.mail,
+        },
+      });
+      
+      console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
+      console.log("lead id ==>", lead.dataValues.id);
+      // const programeTable = await ProgrammeDetails.findByPk(id);
+      lead.dataValues.programmeDetails = await ProgrammeDetails.findOne({
+        where: {
+          leadId: lead.dataValues.id,
+        },
+        // include: [
+        //   {
+        //     model: ProgrammeDetails,
+        //     as: "ProgrameDetail",
+        //   },
+        // ],
+      });
+      console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
+      if (lead)
+        return res.json({
+          success: true,
+          message: "lead retrieved successfully",
+          lead,
+          // programeTable,
+        });
+      else
+        return res.status(400).send({
+          success: false,
+          message: "lead not found for given Id",
+        });
+    }
+
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
 
