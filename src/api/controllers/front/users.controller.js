@@ -13,13 +13,18 @@ const bcrypt = require("bcryptjs");
 exports.create = async (req, res, next) => {
   try {
     let payload = req.body;
+    console.log("User payload", payload);
     console.log(bcrypt.hashSync(req.body.password, 10));
 
     payload.password = bcrypt.hashSync(req.body.password, 10);
     //save the branch in db
     let user = await Users.create(payload);
 
-    await Activity.create({ action: "User created", name: payload.Uname, role: payload.role });
+    await Activity.create({
+      action: "User created",
+      name: payload.Uname,
+      role: payload.Urole,
+    });
 
     return res.json({
       success: true,
@@ -91,13 +96,14 @@ exports.edit = async (req, res, next) => {
       payload,
       {
         // Clause
-        where: {
-          name: payload.Uname,
-          role: payload.role
-        },
+        where: { name: payload.Uname, role: payload.role, id: payload.id },
       }
     );
-    await Activity.create({ action: "User updated", name: payload.Uname, role: payload.role });
+    await Activity.create({
+      action: "User updated",
+      name: payload.Uname,
+      role: payload.Urole,
+    });
 
     return res.send({
       success: true,
@@ -112,10 +118,15 @@ exports.edit = async (req, res, next) => {
 // API to delete branch
 exports.delete = async (req, res, next) => {
   try {
+    let payload = req.body;
     const { id } = req.params;
     if (id) {
       const user = await Users.destroy({ where: { id: id } });
-      await Activity.create({ action: "User deleted", name: "superAdmin", role: "samon" });
+      await Activity.create({
+        action: "User deleted",
+        name: payload.Uname,
+        role: payload.Urole,
+      });
 
       if (user)
         return res.send({
@@ -190,16 +201,23 @@ exports.login = async (req, res) => {
         });
       }
 
-      await Activity.create({ action: "User logged in", name: user.name, role: user.role });
-
+      await Activity.create({
+        action: "User logged in",
+        name: user.name,
+        role: user.role,
+      });
 
       const token = jwt.sign({ id: user.email }, "JWT_SECRET", {
         expiresIn: 86400, // 24 hours
       });
 
-
       return res.status(200).send({
-        ...user
+        //****         ...user */
+        id: user.id,
+        username: user.name,
+        email: user.email,
+        roles: user.role,
+        token: "Benear " + token,
       });
     } else {
       const lead = await Lead.findOne({
@@ -207,7 +225,7 @@ exports.login = async (req, res) => {
           email: req.body.mail,
         },
       });
-      
+
       console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
       console.log("lead id ==>", lead.dataValues.id);
       // const programeTable = await ProgrammeDetails.findByPk(id);
@@ -236,7 +254,6 @@ exports.login = async (req, res) => {
           message: "lead not found for given Id",
         });
     }
-
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -250,10 +267,9 @@ exports.signup = async (req, res) => {
         name: req.body.username,
         email: req.body.mail,
         password: bcrypt.hashSync(req.body.password, 8),
-        role: "user"
+        role: "user",
       });
-      if (user)
-        res.send({ message: "User registered successfully!" });
+      if (user) res.send({ message: "User registered successfully!" });
     }
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -263,7 +279,11 @@ exports.signup = async (req, res) => {
 exports.signout = async (req, res) => {
   // Save User to Database
   try {
-    await Activity.create({ action: "User logged out", name: req.body.name, role: req.body.role });
+    await Activity.create({
+      action: "User logged out",
+      name: req.body.name,
+      role: req.body.role,
+    });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -272,7 +292,7 @@ exports.signout = async (req, res) => {
 exports.search = async (req, res, next) => {
   try {
     const user = await Users.findAndCountAll();
-    let { page, limit} = req.query;
+    let { page, limit } = req.query;
     let { name } = req.body;
     const filter = {};
 
@@ -314,7 +334,7 @@ exports.search = async (req, res, next) => {
   } catch (err) {
     res.send("User  Error " + err);
   }
-}
+};
 
 exports.getUser = async (req, res) => {
   try {
@@ -322,12 +342,12 @@ exports.getUser = async (req, res) => {
       const user = await Users.findOne({
         where: {
           name: req.body.name,
-          role: req.body.role
+          role: req.body.role,
         },
       });
 
       return res.status(200).send({
-        ...user
+        ...user,
       });
     } else {
       const lead = await Lead.findOne({
@@ -335,7 +355,7 @@ exports.getUser = async (req, res) => {
           email: req.body.mail,
         },
       });
-      
+
       console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
       console.log("lead id ==>", lead.dataValues.id);
       // const programeTable = await ProgrammeDetails.findByPk(id);
@@ -364,9 +384,7 @@ exports.getUser = async (req, res) => {
           message: "lead not found for given Id",
         });
     }
-
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
 };
-

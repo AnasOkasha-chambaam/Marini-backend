@@ -1,35 +1,33 @@
 const db = require("../../models");
-const LeadsManagmentModuleStatus = db.LeadsManagmentModuleStatus;
+const MailingInfo = db.MailingInfo;
 const Activity = db.Activity;
 // create program categorys
-exports.createLeadsManagmentModuleStatus = async (req, res, next) => {
+exports.create = async (req, res, next) => {
   try {
-    console.log(
-      "Req.body leadsManagmentModuleStatus controller =====>",
-      req.body
-    );
+    console.log("Req.body mailingInfo controller =====>", req.body);
     //
 
-    let leadsManagmentModuleStatus = {
-      name: req.body.name,
-      Color: req.body.Color,
+    let mailingInfo = {
+      addressOne: req.body.mailing.addressOne,
+      addressTwo: req.body.mailing.addressTwo,
+      country: req.body.mailing.country,
+      phone: req.body.mailing.phone,
+      email: req.body.mailing.email,
     };
 
-    //save the leadsManagmentModuleStatus in db
-    leadsManagmentModuleStatus = await LeadsManagmentModuleStatus.create(
-      leadsManagmentModuleStatus
-    );
+    //save the mailingInfo in db
+    mailingInfo = await MailingInfo.create(mailingInfo);
     await Activity.create({
-      action: "New leadsManagmentModuleStatus Created",
+      action: "New mailingInfo Created",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.json({
       success: true,
-      data: leadsManagmentModuleStatus,
+      data: mailingInfo,
       // Activity,
-      message: "leadsManagmentModuleStatus created successfully",
+      message: "mailingInfo created successfully",
     });
   } catch (err) {
     // res.status(500).send({
@@ -43,9 +41,9 @@ exports.createLeadsManagmentModuleStatus = async (req, res, next) => {
 };
 
 // list program categorys
-exports.listLeadsManagmentModuleStatuss = async (req, res, next) => {
+exports.list = async (req, res, next) => {
   try {
-    const uni = await LeadsManagmentModuleStatus.findAndCountAll();
+    const uni = await MailingInfo.findAndCountAll();
     let { page, limit, name } = req.query;
 
     console.log("unitt", uni.count);
@@ -65,7 +63,7 @@ exports.listLeadsManagmentModuleStatuss = async (req, res, next) => {
       page = Math.ceil(total / limit);
 
     console.log("filter", filter);
-    const faqs = await LeadsManagmentModuleStatus.findAll({
+    const faqs = await MailingInfo.findAll({
       order: [["updatedAt", "DESC"]],
       offset: limit * (page - 1),
       limit: limit,
@@ -87,101 +85,106 @@ exports.listLeadsManagmentModuleStatuss = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.send("leadsManagmentModuleStatus Error " + err);
+    res.send("mailingInfo Error " + err);
   }
   // next();
 };
 
-// API to edit leadsManagmentModuleStatus
+// API to edit mailingInfo
 exports.edit = async (req, res, next) => {
   try {
-    let payload = req.body;
-    const leadsManagmentModuleStatus = await LeadsManagmentModuleStatus.update(
+    let payload = {
+      addressOne: req.body.mailing.addressOne,
+      addressTwo: req.body.mailing.addressTwo,
+      country: req.body.mailing.country,
+      phone: req.body.mailing.phone,
+      email: req.body.mailing.email,
+    };
+
+    const mailingInfo = await MailingInfo.update(
       // Values to update
       payload,
       {
         // Clause
         where: {
-          ID: payload.id,
+          ID: req?.body?.mailing.ID,
         },
       }
     );
     await Activity.create({
-      action: "New leadsManagmentModuleStatus updated",
+      action: "New mailingInfo updated",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.send({
       success: true,
-      message: "leadsManagmentModuleStatus updated successfully",
-      leadsManagmentModuleStatus,
+      message: "mailingInfo updated successfully",
+      mailingInfo,
     });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to delete leadsManagmentModuleStatus
+// API to delete mailingInfo
 exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      const leadsManagmentModuleStatus =
-        await LeadsManagmentModuleStatus.destroy({
-          where: { ID: id },
-        });
+      const mailingInfo = await MailingInfo.destroy({
+        where: { id: id },
+      });
       await Activity.create({
-        action: " leadsManagmentModuleStatus deleted",
+        action: " mailingInfo deleted",
         name: req.body.Uname,
         role: req.body.role,
       });
 
-      if (leadsManagmentModuleStatus)
+      if (mailingInfo)
         return res.send({
           success: true,
-          message: "leadsManagmentModuleStatus Page deleted successfully",
+          message: "mailingInfo Page deleted successfully",
           id,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "leadsManagmentModuleStatus Page not found for given Id",
+          message: "mailingInfo Page not found for given Id",
         });
     } else
       return res.status(400).send({
         success: false,
-        message: "leadsManagmentModuleStatus Id is required",
+        message: "mailingInfo Id is required",
       });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to get  by id a leadsManagmentModuleStatus
+// API to get  by id a mailingInfo
 exports.get = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      console.log("oooooooooooooooooooooooo\n", LeadsManagmentModuleStatus);
-      const leadsManagmentModuleStatus =
-        await LeadsManagmentModuleStatus.findByPk(id);
+      console.log("oooooooooooooooooooooooo\n", MailingInfo);
+      const mailingInfo = await MailingInfo.findByPk(id);
 
-      if (leadsManagmentModuleStatus)
+      if (mailingInfo)
         return res.json({
           success: true,
-          message: "leadsManagmentModuleStatus retrieved successfully",
-          leadsManagmentModuleStatus,
+          message: "mailingInfo retrieved successfully",
+          mailingInfo,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "leadsManagmentModuleStatus not found for given Id",
+          message: "mailingInfo not found for given Id",
         });
     } else
       return res.status(400).send({
         success: false,
-        message: "leadsManagmentModuleStatus Id is required",
+        message: "mailingInfo Id is required",
       });
   } catch (error) {
     return next(error);
