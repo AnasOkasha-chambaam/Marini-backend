@@ -26,7 +26,8 @@ module.exports = (sequelize, DataTypes) => {
       branch: DataTypes.STRING,
       position: DataTypes.STRING,
       date: DataTypes.INTEGER,
-      password: DataTypes.STRING
+      password: DataTypes.STRING,
+      image: DataTypes.STRING
     },
     {
       sequelize,

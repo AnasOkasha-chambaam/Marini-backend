@@ -81,13 +81,16 @@ exports.list = async (req, res, next) => {
 exports.edit = async (req, res, next) => {
   try {
     let payload = req.body;
+    console.log("1223213123", payload);
+    payload.password = bcrypt.hashSync(req.body.password, 10);
     const user = await Users.update(
       // Values to update
       payload,
       {
         // Clause
         where: {
-          id: payload.id,
+          name: payload.Uname,
+          role: payload.role
         },
       }
     );
@@ -193,11 +196,7 @@ exports.login = async (req, res) => {
 
 
       return res.status(200).send({
-        id: user.id,
-        username: user.name,
-        email: user.email,
-        roles: user.role,
-        token: "Benear " + token
+        ...user
       });
     } else {
       const lead = await Lead.findOne({
