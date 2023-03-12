@@ -12,15 +12,13 @@ exports.create = async (req, res, next) => {
       description: req.body.description,
       amount: req.body.amount,
       date: req.body.date,
-      statusID: req.body?.statusID,
     };
 
     //save the expenses in db
     expenses = await Expenses.create(expenses);
     await Activity.create({
       action: "New Expenses Created",
-      name: req.body.Uname,
-      role: req.body.role,
+      name: req.body.Uname, role: req.body.role,
     });
 
     return res.json({
@@ -100,14 +98,13 @@ exports.edit = async (req, res, next) => {
       {
         // Clause
         where: {
-          ID: payload.ID,
+          id: payload.id,
         },
       }
     );
     await Activity.create({
       action: "New expenses updated",
-      name: req.body.Uname,
-      role: req.body.role,
+      name: req.body.Uname, role: req.body.role,
     });
 
     return res.send({
@@ -130,8 +127,7 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " expenses deleted",
-        name: req.body.Uname,
-        role: req.body.role,
+        name: "superAdmin", role: "samon"
       });
 
       if (expenses)

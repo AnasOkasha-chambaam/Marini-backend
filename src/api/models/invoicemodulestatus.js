@@ -14,12 +14,6 @@ module.exports = (sequelize, DataTypes) => {
       InvoiceModuleStatus.hasMany(models.CommissionInvoice, {
         foreignKey: "statusID",
       });
-      InvoiceModuleStatus.hasMany(models.Sales, {
-        foreignKey: "statusID",
-      });
-      InvoiceModuleStatus.hasMany(models.Expenses, {
-        foreignKey: "statusID",
-      });
     }
   }
   InvoiceModuleStatus.init(
