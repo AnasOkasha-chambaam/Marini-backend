@@ -96,11 +96,11 @@ exports.list = async (req, res, next) => {
 exports.edit = async (req, res, next) => {
   try {
     let payload = {
-      addressOne: req.body.billing.addressOne,
-      addressTwo: req.body.billing.addressTwo,
-      country: req.body.billing.country,
-      phone: req.body.billing.phone,
-      email: req.body.billing.email,
+      name: req.body.item.name,
+      price: req.body.item.price,
+      country: req.body.item.country,
+      quantity: req.body.item.quantity,
+      invoiceID: req.body.item.invoiceID,
     };
     const commissionInvoiceItem = await CommissionInvoiceItem.update(
       // Values to update
@@ -108,7 +108,7 @@ exports.edit = async (req, res, next) => {
       {
         // Clause
         where: {
-          ID: req?.body?.billing.ID,
+          ID: req?.body?.item.ID,
         },
       }
     );
