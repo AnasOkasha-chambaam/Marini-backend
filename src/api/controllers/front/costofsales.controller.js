@@ -1,7 +1,6 @@
 const db = require("../../models");
 const CostOfSales = db.CostOfSales;
 const Activity = db.Activity;
-const { InvoiceModuleStatus } = db;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
@@ -13,15 +12,13 @@ exports.create = async (req, res, next) => {
       description: req.body.description,
       amount: req.body.amount,
       date: req.body.date,
-      statusID: req.body?.statusID,
     };
 
     //save the costOfSales in db
     costOfSales = await CostOfSales.create(costOfSales);
     await Activity.create({
       action: "New CostOfSales Created",
-      name: req.body.Uname,
-      role: req.body.role,
+      name: req.body.Uname, role: req.body.role,
     });
 
     return res.json({
@@ -69,7 +66,6 @@ exports.list = async (req, res, next) => {
       offset: limit * (page - 1),
       limit: limit,
       where: filter,
-      include: [InvoiceModuleStatus],
     });
     console.log("faqs", faqs);
     // res.send(uni);
@@ -102,14 +98,13 @@ exports.edit = async (req, res, next) => {
       {
         // Clause
         where: {
-          ID: payload.ID,
+          id: payload.id,
         },
       }
     );
     await Activity.create({
       action: "New costOfSales updated",
-      name: req.body.Uname,
-      role: req.body.role,
+      name: req.body.Uname, role: req.body.role,
     });
 
     return res.send({
@@ -132,8 +127,7 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " costOfSales deleted",
-        name: req.body.Uname,
-        role: req.body.role,
+        name: "superAdmin", role: "samon"
       });
 
       if (costOfSales)
@@ -162,9 +156,7 @@ exports.get = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       console.log("oooooooooooooooooooooooo\n", CostOfSales);
-      const costOfSales = await CostOfSales.findByPk(id, {
-        include: [InvoiceModuleStatus],
-      });
+      const costOfSales = await CostOfSales.findByPk(id);
 
       if (costOfSales)
         return res.json({

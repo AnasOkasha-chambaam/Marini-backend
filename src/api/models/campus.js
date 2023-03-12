@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Campus.belongsTo(models.University, { foreignKey: "UniversityId" });
+      Campus.belongsTo(models.University), { foreignKey: "universityId" };
     }
   }
   Campus.init(
@@ -17,10 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       address1: DataTypes.STRING,
       address2: DataTypes.STRING,
-      phone: DataTypes.STRING,
+      phone: DataTypes.INTEGER,
       email: DataTypes.STRING,
       isMain: DataTypes.BOOLEAN,
-      UniversityId: DataTypes.INTEGER,
     },
     {
       sequelize,

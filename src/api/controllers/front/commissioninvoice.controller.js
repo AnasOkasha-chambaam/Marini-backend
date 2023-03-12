@@ -1,17 +1,10 @@
 const db = require("../../models");
-const { Op } = require("sequelize");
 const CommissionInvoice = db.CommissionInvoice;
 const Activity = db.Activity;
+const { University, InvoiceModuleStatus, Branch } = db;
 
-const {
-  University,
-  InvoiceModuleStatus,
-  CommissionInvoiceItem,
-  Branch,
-  BillingInfo,
-  MailingInfo,
-} = db;
-
+var Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
@@ -19,26 +12,21 @@ exports.create = async (req, res, next) => {
     //
 
     let commissionInvoice = {
-      itemdate: req.body?.itemdate || Date.now(),
-      recipient: req.body?.recipient,
-      email: req.body?.email,
-      service: req.body?.service,
-      amount: req.body?.amount,
-      price: req.body?.price,
-      statusID: +req.body?.statusID,
-      universityID: +req.body?.universityID,
-      branchID: +req.body?.branchID,
-      billingID: +req.body?.billingID,
-      mailingID: +req.body?.mailingID,
-      type: "commission",
+      itemdate: req.body.itemdate,
+      recipient: req.body.recipient,
+      email: req.body.email,
+      service: req.body.service,
+      amount: req.body.amount,
+      statusID: req.body.status,
+      universityID: req.body.university,
+      branchID: req.body.branch,
     };
 
     //save the commissionInvoice in db
     commissionInvoice = await CommissionInvoice.create(commissionInvoice);
     await Activity.create({
       action: "New commissionInvoice Created",
-      name: req.body.Uname,
-      role: req.body.role,
+      name: req.body.Uname, role: req.body.role,
     });
 
     return res.json({
@@ -85,20 +73,8 @@ exports.list = async (req, res, next) => {
       order: [["updatedAt", "DESC"]],
       offset: limit * (page - 1),
       limit: limit,
-      where: {
-        ...filter,
-        type: {
-          [Op.not]: "general",
-        },
-      },
-      include: [
-        University,
-        InvoiceModuleStatus,
-        CommissionInvoiceItem,
-        Branch,
-        MailingInfo,
-        BillingInfo,
-      ],
+      where: filter,
+      include: [University, InvoiceModuleStatus, Branch],
     });
     console.log("faqs", faqs);
     // res.send(uni);
@@ -125,34 +101,29 @@ exports.list = async (req, res, next) => {
 exports.edit = async (req, res, next) => {
   try {
     // let payload = req.body;
-    console.log("ID to update", req.body.ID, "..>>", req.params);
     let payload = {
-      recipient: req.body?.recipient,
-      email: req.body?.email,
-      service: req.body?.service,
-      amount: req.body?.amount,
-      price: req.body?.price,
-      statusID: +req.body?.statusID,
-      universityID: +req.body?.universityID,
-      branchID: +req.body?.branchID,
-      // billingID: +req.body?.billingID,
-      // mailingID: +req.body?.mailingID,
+      itemdate: req.body.itemdate,
+      recipient: req.body.recipient,
+      email: req.body.email,
+      service: req.body.service,
+      amount: req.body.amount,
+      statusID: req.body.status,
+      universityID: req.body.university,
+      branchID: req.body.branch,
     };
-    console.log("ID to update", req.body.ID, "..>>", req.params);
     const commissionInvoice = await CommissionInvoice.update(
       // Values to update
       payload,
       {
         // Clause
         where: {
-          ID: +req?.body?.ID,
+          id: payload.id,
         },
       }
     );
     await Activity.create({
       action: "New commissionInvoice updated",
-      name: req.body.Uname,
-      role: req.body.role,
+      name: req.body.Uname, role: req.body.role,
     });
 
     return res.send({
@@ -175,8 +146,7 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " commissionInvoice deleted",
-        name: req.body.Uname,
-        role: req.body.role,
+        name: req.body.Uname, role: req.body.role,
       });
 
       if (commissionInvoice)
@@ -206,16 +176,7 @@ exports.get = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       console.log("oooooooooooooooooooooooo\n", CommissionInvoice);
-      const commissionInvoice = await CommissionInvoice.findByPk(id, {
-        include: [
-          University,
-          InvoiceModuleStatus,
-          CommissionInvoiceItem,
-          Branch,
-          MailingInfo,
-          BillingInfo,
-        ],
-      });
+      const commissionInvoice = await CommissionInvoice.findByPk(id);
 
       if (commissionInvoice)
         return res.json({
@@ -269,14 +230,7 @@ exports.search = async (req, res, next) => {
       offset: limit * (page - 1),
       limit: limit,
       where: filter,
-      include: [
-        University,
-        InvoiceModuleStatus,
-        CommissionInvoiceItem,
-        Branch,
-        MailingInfo,
-        BillingInfo,
-      ],
+      include: [University, InvoiceModuleStatus, Branch],
     });
     console.log("faqs", faqs);
     // res.send(uni);
@@ -296,4 +250,5 @@ exports.search = async (req, res, next) => {
   } catch (err) {
     res.send("commissionInvoice Error " + err);
   }
+
 };
