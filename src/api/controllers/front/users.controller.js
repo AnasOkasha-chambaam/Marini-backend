@@ -208,35 +208,38 @@ exports.login = async (req, res) => {
         },
       });
       
-      console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
-      console.log("lead id ==>", lead.dataValues.id);
+      // console.log("lead id ==>", lead.dataValues.id);
       // const programeTable = await ProgrammeDetails.findByPk(id);
-      lead.dataValues.programmeDetails = await ProgrammeDetails.findOne({
-        where: {
-          leadId: lead.dataValues.id,
-        },
-        // include: [
-        //   {
-        //     model: ProgrammeDetails,
-        //     as: "ProgrameDetail",
-        //   },
-        // ],
-      });
-      console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
-      if (lead)
+      // lead.dataValues.programmeDetails = await ProgrammeDetails.findOne({
+        //   where: {
+      //     leadId: lead.dataValues.id,
+      //   },
+      //   // include: [
+        //   //   {
+          //   //     model: ProgrammeDetails,
+          //   //     as: "ProgrameDetail",
+          //   //   },
+      //   // ],
+      // });
+      // console.log(">>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
+      if (lead) {
+        console.log("111>>>>>>>>>>>.\n\n\n\n\n\n>>>>>>>>>>>\n\n", lead);
         return res.json({
           success: true,
           message: "lead retrieved successfully",
-          lead,
+          ...lead,
           // programeTable,
         });
-      else
+
+
+      }
+      else {
         return res.status(400).send({
           success: false,
           message: "lead not found for given Id",
         });
+      }
     }
-
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -319,16 +322,28 @@ exports.search = async (req, res, next) => {
 exports.getUser = async (req, res) => {
   try {
     if (req.body.state == 0) {
-      const user = await Users.findOne({
-        where: {
-          name: req.body.name,
-          role: req.body.role
-        },
-      });
-
-      return res.status(200).send({
-        ...user
-      });
+      if(req.body.role !== "leads") {
+        const user = await Users.findOne({
+          where: {
+            name: req.body.name,
+            role: req.body.role
+          },
+        });
+  
+        return res.status(200).send({
+          ...user
+        });
+      }
+      else {
+        const lead = await Lead.findOne({
+          where: {
+            name: req.body.name,
+          },
+        });
+        return res.status(200).send({
+          ...lead
+        });
+      }
     } else {
       const lead = await Lead.findOne({
         where: {
