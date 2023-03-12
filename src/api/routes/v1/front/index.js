@@ -27,6 +27,11 @@ const sales = require("./sales.route");
 const costofsales = require("./costofsales.route");
 const expenses = require("./expenses.route");
 const depitandcredit = require("./depitandcredit.route");
+const billinginfo = require("./billinginfo.route");
+const mailinginfo = require("./mailinginfo.route");
+const generalinvoice = require("./generalinvoice.route");
+const commissioninvoiceitem = require("./commissioninvoiceitem.route");
+const generalinvoiceitem = require("./generalinvoiceitem.route");
 
 const router = express.Router();
 
@@ -53,11 +58,16 @@ router.use("/interestedprogram", interestedProgram);
 router.use("/applicationmodulestatus", applicationModuleStatus);
 router.use("/leadsmanagmentmodulestatus", leadsManagmentModuleStatus);
 router.use("/invoicemodulestatus", invoiceModuleStatus);
-router.use("/commissioninvoice", commissionInvoice);
 router.use("/sales", sales);
 router.use("/costofsales", costofsales);
 router.use("/expenses", expenses);
+router.use("/commissioninvoice", commissionInvoice);
+router.use("/billinginfo", billinginfo);
+router.use("/mailinginfo", mailinginfo);
+router.use("/generalinvoice", generalinvoice);
 router.use("/depitandcredit", depitandcredit);
+router.use("/commissioninvoiceitem", commissioninvoiceitem);
+router.use("/generalinvoiceitem", generalinvoiceitem);
 
 // currencieRoutes;
 module.exports = router;

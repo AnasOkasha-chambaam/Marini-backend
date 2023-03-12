@@ -1,35 +1,33 @@
 const db = require("../../models");
-const LeadsManagmentModuleStatus = db.LeadsManagmentModuleStatus;
+const GeneralInvoiceItem = db.GeneralInvoiceItem;
 const Activity = db.Activity;
 // create program categorys
-exports.createLeadsManagmentModuleStatus = async (req, res, next) => {
+exports.create = async (req, res, next) => {
   try {
-    console.log(
-      "Req.body leadsManagmentModuleStatus controller =====>",
-      req.body
-    );
+    console.log("Req.body generalInvoiceItem controller =====>", req.body);
     //
 
-    let leadsManagmentModuleStatus = {
-      name: req.body.name,
-      Color: req.body.Color,
+    let generalInvoiceItem = {
+      name: req.body.item.name,
+      price: req.body.item.price,
+      country: req.body.item.country,
+      quantity: req.body.item.quantity,
+      invoiceID: req.body.item.invoiceID,
     };
 
-    //save the leadsManagmentModuleStatus in db
-    leadsManagmentModuleStatus = await LeadsManagmentModuleStatus.create(
-      leadsManagmentModuleStatus
-    );
+    //save the generalInvoiceItem in db
+    generalInvoiceItem = await GeneralInvoiceItem.create(generalInvoiceItem);
     await Activity.create({
-      action: "New leadsManagmentModuleStatus Created",
+      action: "New generalInvoiceItem Created",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.json({
       success: true,
-      data: leadsManagmentModuleStatus,
+      data: generalInvoiceItem,
       // Activity,
-      message: "leadsManagmentModuleStatus created successfully",
+      message: "generalInvoiceItem created successfully",
     });
   } catch (err) {
     // res.status(500).send({
@@ -43,9 +41,9 @@ exports.createLeadsManagmentModuleStatus = async (req, res, next) => {
 };
 
 // list program categorys
-exports.listLeadsManagmentModuleStatuss = async (req, res, next) => {
+exports.list = async (req, res, next) => {
   try {
-    const uni = await LeadsManagmentModuleStatus.findAndCountAll();
+    const uni = await GeneralInvoiceItem.findAndCountAll();
     let { page, limit, name } = req.query;
 
     console.log("unitt", uni.count);
@@ -65,7 +63,7 @@ exports.listLeadsManagmentModuleStatuss = async (req, res, next) => {
       page = Math.ceil(total / limit);
 
     console.log("filter", filter);
-    const faqs = await LeadsManagmentModuleStatus.findAll({
+    const faqs = await GeneralInvoiceItem.findAll({
       order: [["updatedAt", "DESC"]],
       offset: limit * (page - 1),
       limit: limit,
@@ -87,101 +85,105 @@ exports.listLeadsManagmentModuleStatuss = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.send("leadsManagmentModuleStatus Error " + err);
+    res.send("generalInvoiceItem Error " + err);
   }
   // next();
 };
 
-// API to edit leadsManagmentModuleStatus
+// API to edit generalInvoiceItem
 exports.edit = async (req, res, next) => {
   try {
-    let payload = req.body;
-    const leadsManagmentModuleStatus = await LeadsManagmentModuleStatus.update(
+    let payload = {
+      name: req.body.item.name,
+      price: req.body.item.price,
+      country: req.body.item.country,
+      quantity: req.body.item.quantity,
+      invoiceID: req.body.item.invoiceID,
+    };
+    const generalInvoiceItem = await GeneralInvoiceItem.update(
       // Values to update
       payload,
       {
         // Clause
         where: {
-          ID: payload.id,
+          ID: req?.body?.item.ID,
         },
       }
     );
     await Activity.create({
-      action: "New leadsManagmentModuleStatus updated",
+      action: "New generalInvoiceItem updated",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.send({
       success: true,
-      message: "leadsManagmentModuleStatus updated successfully",
-      leadsManagmentModuleStatus,
+      message: "generalInvoiceItem updated successfully",
+      generalInvoiceItem,
     });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to delete leadsManagmentModuleStatus
+// API to delete generalInvoiceItem
 exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      const leadsManagmentModuleStatus =
-        await LeadsManagmentModuleStatus.destroy({
-          where: { ID: id },
-        });
+      const generalInvoiceItem = await GeneralInvoiceItem.destroy({
+        where: { ID: id },
+      });
       await Activity.create({
-        action: " leadsManagmentModuleStatus deleted",
+        action: " generalInvoiceItem deleted",
         name: req.body.Uname,
         role: req.body.role,
       });
 
-      if (leadsManagmentModuleStatus)
+      if (generalInvoiceItem)
         return res.send({
           success: true,
-          message: "leadsManagmentModuleStatus Page deleted successfully",
+          message: "generalInvoiceItem Page deleted successfully",
           id,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "leadsManagmentModuleStatus Page not found for given Id",
+          message: "generalInvoiceItem Page not found for given Id",
         });
     } else
       return res.status(400).send({
         success: false,
-        message: "leadsManagmentModuleStatus Id is required",
+        message: "generalInvoiceItem Id is required",
       });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to get  by id a leadsManagmentModuleStatus
+// API to get  by id a generalInvoiceItem
 exports.get = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      console.log("oooooooooooooooooooooooo\n", LeadsManagmentModuleStatus);
-      const leadsManagmentModuleStatus =
-        await LeadsManagmentModuleStatus.findByPk(id);
+      console.log("oooooooooooooooooooooooo\n", GeneralInvoiceItem);
+      const generalInvoiceItem = await GeneralInvoiceItem.findByPk(id);
 
-      if (leadsManagmentModuleStatus)
+      if (generalInvoiceItem)
         return res.json({
           success: true,
-          message: "leadsManagmentModuleStatus retrieved successfully",
-          leadsManagmentModuleStatus,
+          message: "generalInvoiceItem retrieved successfully",
+          generalInvoiceItem,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "leadsManagmentModuleStatus not found for given Id",
+          message: "generalInvoiceItem not found for given Id",
         });
     } else
       return res.status(400).send({
         success: false,
-        message: "leadsManagmentModuleStatus Id is required",
+        message: "generalInvoiceItem Id is required",
       });
   } catch (error) {
     return next(error);

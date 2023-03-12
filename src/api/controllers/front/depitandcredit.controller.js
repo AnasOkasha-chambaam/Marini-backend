@@ -127,7 +127,7 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " depitAndCredit deleted",
-        name: "superAdmin", role: "samon"
+        name: req.body.Uname, role: req.body.role,
       });
 
       if (depitAndCredit)

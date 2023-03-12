@@ -1,6 +1,7 @@
 const db = require("../../models");
 const Sales = db.Sales;
 const Activity = db.Activity;
+const { InvoiceModuleStatus } = db;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
@@ -12,13 +13,15 @@ exports.create = async (req, res, next) => {
       description: req.body.description,
       amount: req.body.amount,
       date: req.body.date,
+      statusID: req.body?.statusID,
     };
 
     //save the sales in db
     sales = await Sales.create(sales);
     await Activity.create({
       action: "New Sales Created",
-      name: req.body.Uname, role: req.body.role,
+      name: req.body.Uname,
+      role: req.body.role,
     });
 
     return res.json({
@@ -66,6 +69,7 @@ exports.list = async (req, res, next) => {
       offset: limit * (page - 1),
       limit: limit,
       where: filter,
+      include: [InvoiceModuleStatus],
     });
     console.log("faqs", faqs);
     // res.send(uni);
@@ -98,13 +102,14 @@ exports.edit = async (req, res, next) => {
       {
         // Clause
         where: {
-          id: payload.id,
+          ID: payload.ID,
         },
       }
     );
     await Activity.create({
       action: "New sales updated",
-      name: req.body.Uname, role: req.body.role,
+      name: req.body.Uname,
+      role: req.body.role,
     });
 
     return res.send({
@@ -127,7 +132,8 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " sales deleted",
-        name: req.body.Uname, role: req.body.role,
+        name: req.body.Uname,
+        role: req.body.role,
       });
 
       if (sales)
@@ -156,7 +162,9 @@ exports.get = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       console.log("oooooooooooooooooooooooo\n", Sales);
-      const sales = await Sales.findByPk(id);
+      const sales = await Sales.findByPk(id, {
+        include: [InvoiceModuleStatus],
+      });
 
       if (sales)
         return res.json({
