@@ -63,15 +63,18 @@ module.exports = (sequelize, DataTypes) => {
       },
       service: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: "",
       },
       amount: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: "",
       },
       price: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: "",
       },
       statusID: {
         type: DataTypes.INTEGER,
