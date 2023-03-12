@@ -1,8 +1,14 @@
 const db = require("../../models");
 const GeneralInvoice = db.GeneralInvoice;
 const Activity = db.Activity;
-const { University, InvoiceModuleStatus, Branch, BillingInfo, MailingInfo } =
-  db;
+const {
+  University,
+  InvoiceModuleStatus,
+  GeneralInvoiceItem,
+  Branch,
+  BillingInfo,
+  MailingInfo,
+} = db;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
@@ -80,6 +86,7 @@ exports.list = async (req, res, next) => {
       include: [
         University,
         InvoiceModuleStatus,
+        GeneralInvoiceItem,
         Branch,
         BillingInfo,
         MailingInfo,
@@ -89,7 +96,7 @@ exports.list = async (req, res, next) => {
     // res.send(uni);
     return res.send({
       success: true,
-      message: "commission invoice fetched successfully",
+      message: "general invoice fetched successfully",
       data: {
         faqs,
         pagination: {
@@ -194,6 +201,7 @@ exports.get = async (req, res, next) => {
         include: [
           University,
           InvoiceModuleStatus,
+          GeneralInvoiceItem,
           Branch,
           MailingInfo,
           BillingInfo,
@@ -218,5 +226,65 @@ exports.get = async (req, res, next) => {
       });
   } catch (error) {
     return next(error);
+  }
+};
+
+exports.search = async (req, res, next) => {
+  // console.log("req.query",req.query);
+  try {
+    const uni = await GeneralInvoice.findAndCountAll();
+    let { page, limit } = req.query;
+    let { name } = req.body;
+
+    console.log("unitt", uni.count);
+    console.log("req.queryy", req.query); //name
+    const filter = {};
+
+    page = page !== undefined && page !== "" ? parseInt(page) : 1;
+    limit = limit !== undefined && limit !== "" ? parseInt(limit) : 10;
+
+    if (name) {
+      filter.name = {
+        [Op.like]: "%" + name + "%",
+      };
+    }
+
+    const total = uni.count;
+
+    if (page > Math.ceil(total / limit) && total > 0)
+      page = Math.ceil(total / limit);
+
+    console.log("filter", filter);
+    const faqs = await GeneralInvoice.findAll({
+      order: [["updatedAt", "DESC"]],
+      offset: limit * (page - 1),
+      limit: limit,
+      where: filter,
+      include: [
+        University,
+        InvoiceModuleStatus,
+        GeneralInvoiceItem,
+        Branch,
+        MailingInfo,
+        BillingInfo,
+      ],
+    });
+    console.log("faqs", faqs);
+    // res.send(uni);
+    return res.send({
+      success: true,
+      message: "gneral invoice fetched successfully",
+      data: {
+        faqs,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit) <= 0 ? 1 : Math.ceil(total / limit),
+        },
+      },
+    });
+  } catch (err) {
+    res.send("generalInvoice Error " + err);
   }
 };
