@@ -30,6 +30,7 @@ const depitandcredit = require("./depitandcredit.route");
 const billinginfo = require("./billinginfo.route");
 const mailinginfo = require("./mailinginfo.route");
 const generalinvoice = require("./generalinvoice.route");
+const commissioninvoiceitem = require("./commissioninvoiceitem.route");
 
 const router = express.Router();
 
@@ -64,6 +65,7 @@ router.use("/billinginfo", billinginfo);
 router.use("/mailinginfo", mailinginfo);
 router.use("/generalinvoice", generalinvoice);
 router.use("/depitandcredit", depitandcredit);
+router.use("/commissioninvoiceitem", commissioninvoiceitem);
 
 // currencieRoutes;
 module.exports = router;

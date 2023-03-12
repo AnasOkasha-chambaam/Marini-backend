@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       CommissionInvoice.belongsTo(models.MailingInfo, {
         foreignKey: "mailingID",
       });
+      CommissionInvoice.hasMany(models.CommissionInvoiceItem, {
+        foreignKey: "invoiceID",
+      });
     }
   }
   CommissionInvoice.init(

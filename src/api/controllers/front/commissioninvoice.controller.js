@@ -3,8 +3,14 @@ const { Op } = require("sequelize");
 const CommissionInvoice = db.CommissionInvoice;
 const Activity = db.Activity;
 
-const { University, InvoiceModuleStatus, Branch, BillingInfo, MailingInfo } =
-  db;
+const {
+  University,
+  InvoiceModuleStatus,
+  CommissionInvoiceItem,
+  Branch,
+  BillingInfo,
+  MailingInfo,
+} = db;
 
 // create program categorys
 exports.create = async (req, res, next) => {
@@ -88,9 +94,10 @@ exports.list = async (req, res, next) => {
       include: [
         University,
         InvoiceModuleStatus,
+        CommissionInvoiceItem,
         Branch,
-        BillingInfo,
         MailingInfo,
+        BillingInfo,
       ],
     });
     console.log("faqs", faqs);
@@ -203,6 +210,7 @@ exports.get = async (req, res, next) => {
         include: [
           University,
           InvoiceModuleStatus,
+          CommissionInvoiceItem,
           Branch,
           MailingInfo,
           BillingInfo,
@@ -264,6 +272,7 @@ exports.search = async (req, res, next) => {
       include: [
         University,
         InvoiceModuleStatus,
+        CommissionInvoiceItem,
         Branch,
         MailingInfo,
         BillingInfo,
