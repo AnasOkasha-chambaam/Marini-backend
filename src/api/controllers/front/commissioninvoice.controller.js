@@ -54,10 +54,10 @@ exports.create = async (req, res, next) => {
 // list program categorys
 exports.list = async (req, res, next) => {
   try {
-    const uni = await CommissionInvoice.findAndCountAll();
+    const allCommissionInvoices = await CommissionInvoice.findAndCountAll();
     let { page, limit, name } = req.query;
 
-    console.log("unitt", uni.count);
+    console.log("unitt", allCommissionInvoices.count);
     console.log("req.queryy", req.query); //name
     const filter = {};
 
