@@ -30,7 +30,8 @@ exports.create = async (req, res, next) => {
     commissionInvoice = await CommissionInvoice.create(commissionInvoice);
     await Activity.create({
       action: "New commissionInvoice Created",
-      name: req.body.Uname, role: req.body.role,
+      name: req.body.Uname,
+      role: req.body.role,
     });
 
     return res.json({
@@ -195,7 +196,8 @@ exports.edit = async (req, res, next) => {
     );
     await Activity.create({
       action: "New commissionInvoice updated",
-      name: req.body.Uname, role: req.body.role,
+      name: req.body.Uname,
+      role: req.body.role,
     });
 
     return res.send({
@@ -218,7 +220,8 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " commissionInvoice deleted",
-        name: req.body.Uname, role: req.body.role,
+        name: req.body.Uname,
+        role: req.body.role,
       });
 
       if (commissionInvoice)
