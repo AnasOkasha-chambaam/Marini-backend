@@ -1,10 +1,18 @@
 const db = require("../../models");
+const { Op } = require("sequelize");
 const CommissionInvoice = db.CommissionInvoice;
 const Activity = db.Activity;
-const { University, InvoiceModuleStatus, Branch } = db;
 
-var Sequelize = require("sequelize");
-const Op = Sequelize.Op;
+const {
+  University,
+  InvoiceModuleStatus,
+  CommissionInvoiceItem,
+  Branch,
+  BillingInfo,
+  MailingInfo,
+  Assets,
+} = db;
+
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
@@ -54,10 +62,15 @@ exports.create = async (req, res, next) => {
 // list program categorys
 exports.list = async (req, res, next) => {
   try {
-    const allCommissionInvoices = await CommissionInvoice.findAndCountAll();
+    const allCommissionInvoices = await CommissionInvoice.findAndCountAll({
+      include: [CommissionInvoiceItem],
+    });
     let { page, limit, name } = req.query;
 
-    console.log("unitt", allCommissionInvoices.count);
+    console.log(
+      "allCommissionInvoices first item price",
+      allCommissionInvoices.count
+    );
     console.log("req.queryy", req.query); //name
     const filter = {};
 
