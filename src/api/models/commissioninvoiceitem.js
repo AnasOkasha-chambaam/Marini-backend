@@ -3,7 +3,7 @@
 const { Model } = require("sequelize");
 // const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Expenses extends Model {
+  class CommissionInvoiceItem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Expenses.belongsTo(models.InvoiceModuleStatus, {
-        foreignKey: "statusID",
+      CommissionInvoiceItem.belongsTo(models.CommissionInvoice, {
+        foreignKey: "invoiceID",
       });
     }
   }
-  Expenses.init(
+  CommissionInvoiceItem.init(
     {
       ID: {
         type: DataTypes.INTEGER,
@@ -34,27 +34,35 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: "",
       },
-      description: {
+      price: {
         type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: "",
       },
-      amount: {
+      quantity: {
         type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: "",
       },
-      date: {
-        type: DataTypes.DATE,
+      total: {
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: DataTypes.NOW,
+        defaultValue: "",
+      },
+      invoiceID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
     },
     {
       sequelize,
-      modelName: "Expenses",
-      tableName: "Expenses".toLowerCase(),
+      modelName: "CommissionInvoiceItem",
+      tableName: "CommissionInvoiceItem".toLowerCase(),
     }
   );
-  // const level = await Expenses.findAll();
-  return Expenses;
+  // const level = await CommissionInvoiceItem.findAll();
+  return CommissionInvoiceItem;
 };

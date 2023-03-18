@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      CostOfSales.belongsTo(models.InvoiceModuleStatus, {
+        foreignKey: "statusID",
+      });
     }
   }
   CostOfSales.init(
@@ -31,6 +34,11 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      statusID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: Math.floor(Math.random() * 4 + 1),
       },
       description: {
         type: DataTypes.STRING,

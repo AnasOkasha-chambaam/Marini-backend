@@ -7,7 +7,7 @@ const multer = require("multer");
 const upload = multer();
 router.route("/create").post(upload.any(), controller.createLeadGroup);
 router.route("/listLeadGroups").get(controller.listLeadGroups);
-router.route("/edit").put(controller.edit);
+router.route("/edit").put(upload.any(), controller.edit);
 router.route("/delete").post(controller.delete);
 router.route("/get/:id").get(controller.get);
 // router.findAll();

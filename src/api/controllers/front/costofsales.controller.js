@@ -1,6 +1,7 @@
 const db = require("../../models");
 const CostOfSales = db.CostOfSales;
 const Activity = db.Activity;
+const { InvoiceModuleStatus } = db;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
@@ -12,13 +13,15 @@ exports.create = async (req, res, next) => {
       description: req.body.description,
       amount: req.body.amount,
       date: req.body.date,
+      statusID: req.body?.statusID,
     };
 
     //save the costOfSales in db
     costOfSales = await CostOfSales.create(costOfSales);
     await Activity.create({
       action: "New CostOfSales Created",
-      name: req.body.Uname, role: req.body.role,
+      name: req.body.Uname,
+      role: req.body.role,
     });
 
     return res.json({
@@ -41,10 +44,10 @@ exports.create = async (req, res, next) => {
 // list costOfSales
 exports.list = async (req, res, next) => {
   try {
-    const uni = await CostOfSales.findAndCountAll();
+    const allCostOfSales = await CostOfSales.findAndCountAll();
     let { page, limit, name } = req.query;
 
-    console.log("unitt", uni.count);
+    console.log("CostOfSales", allCostOfSales.count);
     console.log("req.queryy", req.query); //name
     const filter = {};
 
@@ -55,7 +58,7 @@ exports.list = async (req, res, next) => {
       filter.name = { $LIKE: name, $options: "gi" };
     }
 
-    const total = uni.count;
+    const total = allCostOfSales.count;
 
     if (page > Math.ceil(total / limit) && total > 0)
       page = Math.ceil(total / limit);
@@ -66,9 +69,17 @@ exports.list = async (req, res, next) => {
       offset: limit * (page - 1),
       limit: limit,
       where: filter,
+      include: [InvoiceModuleStatus],
     });
     console.log("faqs", faqs);
-    // res.send(uni);
+    // Anasite - Edits: Total price
+    const totalPrice = await allCostOfSales.rows?.reduce(
+      (accumulator, singleCostOfSale) => {
+        return +accumulator + +singleCostOfSale.amount;
+      },
+      0
+    );
+    // res.send(allCostOfSales);
     return res.send({
       success: true,
       message: "costOfSales fetched successfully",
@@ -80,6 +91,7 @@ exports.list = async (req, res, next) => {
           total,
           pages: Math.ceil(total / limit) <= 0 ? 1 : Math.ceil(total / limit),
         },
+        totalPrice,
       },
     });
   } catch (err) {
@@ -98,13 +110,14 @@ exports.edit = async (req, res, next) => {
       {
         // Clause
         where: {
-          id: payload.id,
+          ID: payload.ID,
         },
       }
     );
     await Activity.create({
       action: "New costOfSales updated",
-      name: req.body.Uname, role: req.body.role,
+      name: req.body.Uname,
+      role: req.body.role,
     });
 
     return res.send({
@@ -127,7 +140,8 @@ exports.delete = async (req, res, next) => {
       });
       await Activity.create({
         action: " costOfSales deleted",
-        name: "superAdmin", role: "samon"
+        name: req.body.Uname,
+        role: req.body.role,
       });
 
       if (costOfSales)
@@ -156,7 +170,9 @@ exports.get = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       console.log("oooooooooooooooooooooooo\n", CostOfSales);
-      const costOfSales = await CostOfSales.findByPk(id);
+      const costOfSales = await CostOfSales.findByPk(id, {
+        include: [InvoiceModuleStatus],
+      });
 
       if (costOfSales)
         return res.json({

@@ -22,7 +22,7 @@ exports.create = async (req, res, next) => {
 
     console.log("12313", data);
 
-    if(data) {
+    if (data) {
       return res.json({
         success: true,
         data: data,
@@ -40,7 +40,11 @@ exports.create = async (req, res, next) => {
 
     console.log(req.body.role);
 
-    await Activity.create({ action: "New Currency created", name: req.body.Uname, role: req.body.role });
+    await Activity.create({
+      action: "New Currency created",
+      name: req.body.Uname,
+      role: req.body.role,
+    });
 
     return res.json({
       success: true,
@@ -139,7 +143,11 @@ exports.delete = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       const currency = await Currency.destroy({ where: { id: id } });
-      await Activity.create({ action: "New Currency deleted", name: "superAdmin", role: "samon" });
+      await Activity.create({
+        action: "New Currency deleted",
+        name: req.body.Uname,
+        role: req.body.role,
+      });
 
       if (currency)
         return res.send({
@@ -164,7 +172,13 @@ exports.delete = async (req, res, next) => {
 // API to get  by id a currency
 exports.get = async (req, res, next) => {
   try {
-      const currency = await Currency.findAll({order: [["updatedAt", "DESC"]]});
+    const { id } = req.params;
+    if (id) {
+      const currency = await Currency.findByPk(id);
+
+      // const currency = await Currency.findAll({
+      //   order: [["updatedAt", "DESC"]],
+      // });
 
       if (currency)
         return res.json({
@@ -177,6 +191,10 @@ exports.get = async (req, res, next) => {
           success: false,
           message: "currency not found for given Id",
         });
+    } else
+      return res
+        .status(400)
+        .send({ success: false, message: "branch Id is required" });
   } catch (error) {
     return next(error);
   }

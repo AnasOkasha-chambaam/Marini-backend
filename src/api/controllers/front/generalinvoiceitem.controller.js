@@ -1,34 +1,33 @@
 const db = require("../../models");
-const Sales = db.Sales;
+const GeneralInvoiceItem = db.GeneralInvoiceItem;
 const Activity = db.Activity;
-const { InvoiceModuleStatus } = db;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
-    console.log("Req.body sales controller =====>", req.body);
+    console.log("Req.body generalInvoiceItem controller =====>", req.body);
     //
 
-    let sales = {
-      name: req.body.name,
-      description: req.body.description,
-      amount: req.body.amount,
-      date: req.body.date,
-      statusID: req.body?.statusID,
+    let generalInvoiceItem = {
+      name: req.body.item.name,
+      price: req.body.item.price,
+      country: req.body.item.country,
+      quantity: req.body.item.quantity,
+      invoiceID: req.body.item.invoiceID,
     };
 
-    //save the sales in db
-    sales = await Sales.create(sales);
+    //save the generalInvoiceItem in db
+    generalInvoiceItem = await GeneralInvoiceItem.create(generalInvoiceItem);
     await Activity.create({
-      action: "New Sales Created",
+      action: "New generalInvoiceItem Created",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.json({
       success: true,
-      data: sales,
+      data: generalInvoiceItem,
       // Activity,
-      message: "sales created successfully",
+      message: "generalInvoiceItem created successfully",
     });
   } catch (err) {
     // res.status(500).send({
@@ -41,13 +40,13 @@ exports.create = async (req, res, next) => {
   }
 };
 
-// list sales
+// list program categorys
 exports.list = async (req, res, next) => {
   try {
-    const allSales = await Sales.findAndCountAll();
+    const uni = await GeneralInvoiceItem.findAndCountAll();
     let { page, limit, name } = req.query;
 
-    console.log("allSales", allSales.count);
+    console.log("unitt", uni.count);
     console.log("req.queryy", req.query); //name
     const filter = {};
 
@@ -58,28 +57,20 @@ exports.list = async (req, res, next) => {
       filter.name = { $LIKE: name, $options: "gi" };
     }
 
-    const total = allSales.count;
+    const total = uni.count;
 
     if (page > Math.ceil(total / limit) && total > 0)
       page = Math.ceil(total / limit);
 
     console.log("filter", filter);
-    const faqs = await Sales.findAll({
+    const faqs = await GeneralInvoiceItem.findAll({
       order: [["updatedAt", "DESC"]],
       offset: limit * (page - 1),
       limit: limit,
       where: filter,
-      include: [InvoiceModuleStatus],
     });
     console.log("faqs", faqs);
-    // Anasite - Edits: Total price
-    const totalPrice = await allSales.rows?.reduce(
-      (accumulator, singleSale) => {
-        return +accumulator + +singleSale.amount;
-      },
-      0
-    );
-    // res.send(allSales);
+    // res.send(uni);
     return res.send({
       success: true,
       message: "program categorys fetched successfully",
@@ -91,104 +82,109 @@ exports.list = async (req, res, next) => {
           total,
           pages: Math.ceil(total / limit) <= 0 ? 1 : Math.ceil(total / limit),
         },
-        totalPrice,
       },
     });
   } catch (err) {
-    res.send("sales Error " + err);
+    res.send("generalInvoiceItem Error " + err);
   }
   // next();
 };
 
-// API to edit sales
+// API to edit generalInvoiceItem
 exports.edit = async (req, res, next) => {
   try {
-    let payload = req.body;
-    const sales = await Sales.update(
+    let payload = {
+      name: req.body.item.name,
+      price: req.body.item.price,
+      country: req.body.item.country,
+      quantity: req.body.item.quantity,
+      invoiceID: req.body.item.invoiceID,
+    };
+    const generalInvoiceItem = await GeneralInvoiceItem.update(
       // Values to update
       payload,
       {
         // Clause
         where: {
-          ID: payload.ID,
+          ID: req?.body?.item.ID,
         },
       }
     );
     await Activity.create({
-      action: "New sales updated",
+      action: "New generalInvoiceItem updated",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.send({
       success: true,
-      message: "sales updated successfully",
-      sales,
+      message: "generalInvoiceItem updated successfully",
+      generalInvoiceItem,
     });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to delete sales
+// API to delete generalInvoiceItem
 exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      const sales = await Sales.destroy({
-        where: { id: id },
+      const generalInvoiceItem = await GeneralInvoiceItem.destroy({
+        where: { ID: id },
       });
       await Activity.create({
-        action: " sales deleted",
+        action: " generalInvoiceItem deleted",
         name: req.body.Uname,
         role: req.body.role,
       });
 
-      if (sales)
+      if (generalInvoiceItem)
         return res.send({
           success: true,
-          message: "sales Page deleted successfully",
+          message: "generalInvoiceItem Page deleted successfully",
           id,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "sales Page not found for given Id",
+          message: "generalInvoiceItem Page not found for given Id",
         });
     } else
-      return res
-        .status(400)
-        .send({ success: false, message: "sales Id is required" });
+      return res.status(400).send({
+        success: false,
+        message: "generalInvoiceItem Id is required",
+      });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to get  by id a sales
+// API to get  by id a generalInvoiceItem
 exports.get = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      console.log("oooooooooooooooooooooooo\n", Sales);
-      const sales = await Sales.findByPk(id, {
-        include: [InvoiceModuleStatus],
-      });
+      console.log("oooooooooooooooooooooooo\n", GeneralInvoiceItem);
+      const generalInvoiceItem = await GeneralInvoiceItem.findByPk(id);
 
-      if (sales)
+      if (generalInvoiceItem)
         return res.json({
           success: true,
-          message: "sales retrieved successfully",
-          sales,
+          message: "generalInvoiceItem retrieved successfully",
+          generalInvoiceItem,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "sales not found for given Id",
+          message: "generalInvoiceItem not found for given Id",
         });
     } else
-      return res
-        .status(400)
-        .send({ success: false, message: "sales Id is required" });
+      return res.status(400).send({
+        success: false,
+        message: "generalInvoiceItem Id is required",
+      });
   } catch (error) {
     return next(error);
   }

@@ -3,7 +3,7 @@
 const { Model } = require("sequelize");
 // const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Expenses extends Model {
+  class MailingInfo extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Expenses.belongsTo(models.InvoiceModuleStatus, {
-        foreignKey: "statusID",
+      MailingInfo.hasMany(models.CommissionInvoice, {
+        foreignKey: "mailingID",
       });
     }
   }
-  Expenses.init(
+  MailingInfo.init(
     {
       ID: {
         type: DataTypes.INTEGER,
@@ -31,30 +31,33 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-      name: {
+      addressOne: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      description: {
+      addressTwo: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      amount: {
+      country: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      date: {
-        type: DataTypes.DATE,
+      phone: {
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: DataTypes.NOW,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: "Expenses",
-      tableName: "Expenses".toLowerCase(),
+      modelName: "MailingInfo",
+      tableName: "MailingInfo".toLowerCase(),
     }
   );
-  // const level = await Expenses.findAll();
-  return Expenses;
+  // const level = await MailingInfo.findAll();
+  return MailingInfo;
 };

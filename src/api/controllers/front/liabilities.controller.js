@@ -1,34 +1,30 @@
 const db = require("../../models");
-const Sales = db.Sales;
+const Liabilities = db.Liabilities;
 const Activity = db.Activity;
-const { InvoiceModuleStatus } = db;
 // create program categorys
 exports.create = async (req, res, next) => {
   try {
-    console.log("Req.body sales controller =====>", req.body);
+    console.log("Req.body liabilities controller =====>", req.body);
     //
 
-    let sales = {
-      name: req.body.name,
-      description: req.body.description,
-      amount: req.body.amount,
-      date: req.body.date,
-      statusID: req.body?.statusID,
+    let liabilities = {
+      name: req.body.item.name,
+      price: req.body.item.price,
     };
 
-    //save the sales in db
-    sales = await Sales.create(sales);
+    //save the liabilities in db
+    liabilities = await Liabilities.create(liabilities);
     await Activity.create({
-      action: "New Sales Created",
+      action: "New liabilities Created",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.json({
       success: true,
-      data: sales,
+      data: liabilities,
       // Activity,
-      message: "sales created successfully",
+      message: "liabilities created successfully",
     });
   } catch (err) {
     // res.status(500).send({
@@ -41,13 +37,13 @@ exports.create = async (req, res, next) => {
   }
 };
 
-// list sales
+// list program categorys
 exports.list = async (req, res, next) => {
   try {
-    const allSales = await Sales.findAndCountAll();
+    const allLiabilities = await Liabilities.findAndCountAll();
     let { page, limit, name } = req.query;
 
-    console.log("allSales", allSales.count);
+    console.log("allLiabilities", allLiabilities.count);
     console.log("req.queryy", req.query); //name
     const filter = {};
 
@@ -58,28 +54,27 @@ exports.list = async (req, res, next) => {
       filter.name = { $LIKE: name, $options: "gi" };
     }
 
-    const total = allSales.count;
+    const total = allLiabilities.count;
 
     if (page > Math.ceil(total / limit) && total > 0)
       page = Math.ceil(total / limit);
 
     console.log("filter", filter);
-    const faqs = await Sales.findAll({
+    const faqs = await Liabilities.findAll({
       order: [["updatedAt", "DESC"]],
       offset: limit * (page - 1),
       limit: limit,
       where: filter,
-      include: [InvoiceModuleStatus],
     });
     console.log("faqs", faqs);
     // Anasite - Edits: Total price
-    const totalPrice = await allSales.rows?.reduce(
-      (accumulator, singleSale) => {
-        return +accumulator + +singleSale.amount;
+    const totalPrice = await allLiabilities.rows?.reduce(
+      (accumulator, singleAsset) => {
+        return +accumulator + +singleAsset.price;
       },
       0
     );
-    // res.send(allSales);
+    // res.send(allLiabilities);
     return res.send({
       success: true,
       message: "program categorys fetched successfully",
@@ -95,100 +90,103 @@ exports.list = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.send("sales Error " + err);
+    res.send("liabilities Error " + err);
   }
   // next();
 };
 
-// API to edit sales
+// API to edit liabilities
 exports.edit = async (req, res, next) => {
   try {
-    let payload = req.body;
-    const sales = await Sales.update(
+    let payload = {
+      name: req.body.item.name,
+      price: req.body.item.price,
+    };
+    const liabilities = await Liabilities.update(
       // Values to update
       payload,
       {
         // Clause
         where: {
-          ID: payload.ID,
+          ID: req?.body?.item.ID,
         },
       }
     );
     await Activity.create({
-      action: "New sales updated",
+      action: "New liabilities updated",
       name: req.body.Uname,
       role: req.body.role,
     });
 
     return res.send({
       success: true,
-      message: "sales updated successfully",
-      sales,
+      message: "liabilities updated successfully",
+      liabilities,
     });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to delete sales
+// API to delete liabilities
 exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      const sales = await Sales.destroy({
-        where: { id: id },
+      const liabilities = await Liabilities.destroy({
+        where: { ID: id },
       });
       await Activity.create({
-        action: " sales deleted",
+        action: " liabilities deleted",
         name: req.body.Uname,
         role: req.body.role,
       });
 
-      if (sales)
+      if (liabilities)
         return res.send({
           success: true,
-          message: "sales Page deleted successfully",
+          message: "liabilities Page deleted successfully",
           id,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "sales Page not found for given Id",
+          message: "liabilities Page not found for given Id",
         });
     } else
-      return res
-        .status(400)
-        .send({ success: false, message: "sales Id is required" });
+      return res.status(400).send({
+        success: false,
+        message: "liabilities Id is required",
+      });
   } catch (error) {
     return next(error);
   }
 };
 
-// API to get  by id a sales
+// API to get  by id a liabilities
 exports.get = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (id) {
-      console.log("oooooooooooooooooooooooo\n", Sales);
-      const sales = await Sales.findByPk(id, {
-        include: [InvoiceModuleStatus],
-      });
+      console.log("oooooooooooooooooooooooo\n", Liabilities);
+      const liabilities = await Liabilities.findByPk(id);
 
-      if (sales)
+      if (liabilities)
         return res.json({
           success: true,
-          message: "sales retrieved successfully",
-          sales,
+          message: "liabilities retrieved successfully",
+          liabilities,
         });
       else
         return res.status(400).send({
           success: false,
-          message: "sales not found for given Id",
+          message: "liabilities not found for given Id",
         });
     } else
-      return res
-        .status(400)
-        .send({ success: false, message: "sales Id is required" });
+      return res.status(400).send({
+        success: false,
+        message: "liabilities Id is required",
+      });
   } catch (error) {
     return next(error);
   }
