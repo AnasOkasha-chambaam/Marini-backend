@@ -88,8 +88,8 @@ exports.list = async (req, res, next) => {
           limit,
           total,
           pages: Math.ceil(total / limit) <= 0 ? 1 : Math.ceil(total / limit),
-          totalPrice
         },
+        totalPrice
       },
     });
   } catch (err) {
