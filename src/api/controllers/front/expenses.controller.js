@@ -43,10 +43,10 @@ exports.create = async (req, res, next) => {
 // list expenses
 exports.list = async (req, res, next) => {
   try {
-    const uni = await Expenses.findAndCountAll();
+    const allExpenses = await Expenses.findAndCountAll();
     let { page, limit, name } = req.query;
 
-    console.log("unitt", uni.count);
+    console.log("allExpenses", allExpenses.count);
     console.log("req.queryy", req.query); //name
     const filter = {};
 
@@ -57,7 +57,7 @@ exports.list = async (req, res, next) => {
       filter.name = { $LIKE: name, $options: "gi" };
     }
 
-    const total = uni.count;
+    const total = allExpenses.count;
 
     if (page > Math.ceil(total / limit) && total > 0)
       page = Math.ceil(total / limit);
@@ -70,7 +70,14 @@ exports.list = async (req, res, next) => {
       where: filter,
     });
     console.log("faqs", faqs);
-    // res.send(uni);
+        // Anasite - Edits: Total price
+        const totalPrice = await allExpenses.rows?.reduce(
+          (accumulator, singleSale) => {
+            return +accumulator + +singleSale.amount;
+          },
+          0
+        );
+    // res.send(allExpenses);
     return res.send({
       success: true,
       message: "expenses fetched successfully",
@@ -81,6 +88,7 @@ exports.list = async (req, res, next) => {
           limit,
           total,
           pages: Math.ceil(total / limit) <= 0 ? 1 : Math.ceil(total / limit),
+          totalPrice
         },
       },
     });
