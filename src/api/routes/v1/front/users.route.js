@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require('express');
 //  const controller = require('../../../controllers/front/university.controller')
 // const controller = require('../../../controllers/front/users.controller');
 const { uploadSingle, upload } = require("../../../utils/upload");
-const controller = require("../../../controllers/front/users.controller");
+const controller = require('../../../controllers/front/users.controller');
 
 const router = express.Router();
 
@@ -20,3 +20,9 @@ router.route("/search").post(controller.search);
 router.route("/signout").post(controller.signout);
 
 module.exports = router;
+
+
+
+
+
+

@@ -10,11 +10,7 @@ exports.create = async (req, res, next) => {
     let payload = req.body;
     //save the branch in db
     let branch = await Branch.create(payload);
-    await Activity.create({
-      action: "Branch created",
-      name: req.body.Uname,
-      role: req.body.role,
-    });
+    await Activity.create({ action: "Branch created", name: req.body.Uname, role: req.body.role });
 
     return res.json({
       success: true,
@@ -88,11 +84,7 @@ exports.edit = async (req, res, next) => {
         },
       }
     );
-    await Activity.create({
-      action: "Branch updated",
-      name: req.body.Uname,
-      role: req.body.role,
-    });
+    await Activity.create({ action: "Branch updated", name: req.body.Uname, role: req.body.role });
 
     return res.send({
       success: true,
@@ -110,11 +102,7 @@ exports.delete = async (req, res, next) => {
     const { id } = req.params;
     if (id) {
       const branch = await Branch.destroy({ where: { id: id } });
-      await Activity.create({
-        action: "Branch deleted",
-        name: "superAdmin",
-        role: "samon",
-      });
+      await Activity.create({ action: "Branch deleted", name: "samon", role: "superAdmin" });
 
       if (branch)
         return res.send({
@@ -155,10 +143,13 @@ exports.get = async (req, res, next) => {
           message: "branch not found for given Id",
         });
     } else {
+
       const branch = await Branch.findAll({});
 
-      return res.send({ success: true, branch });
+      return res
+        .send({ success: true, branch});
     }
+      
   } catch (error) {
     return next(error);
   }

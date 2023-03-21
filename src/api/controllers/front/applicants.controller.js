@@ -10,13 +10,19 @@ const Activity = db.Activity;
 var Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
-let transporter = nodemailer.createTransport({
-  service: "gmail",
+const transport = nodemailer.createTransport({
   auth: {
-    user: "anton.david0017@gmail.com",
-    pass: "wdsqnmnkglvkgfbd",
+    user: "haodev007@gmail.com",
+    pass: "jcyxsvamgupyqpvv",
   },
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
 });
+
+// setup e-mail data with unicode symbols
+
+
 
 var readHTMLFile = function (path, callback) {
   fs.readFile(path, { encoding: "utf-8" }, function (err, html) {
@@ -31,7 +37,6 @@ var readHTMLFile = function (path, callback) {
 
 // create applicants
 exports.createApplicant = async (req, res, next) => {
-  console.log("applicantsid", Applicants);
 
   try {
     // console.log("Req.body applicants =====>", req.body);
@@ -52,7 +57,7 @@ exports.createApplicant = async (req, res, next) => {
       passportNo: req.body.passportNo,
       fileUpload:
         req?.files?.fileUpload && req?.files?.fileUpload[0]
-          ? req?.files?.fileUpload[0].filename
+          ? JSON.stringify(req?.files?.fileUpload[0].filename)
           : "",
     };
 
@@ -67,7 +72,7 @@ exports.createApplicant = async (req, res, next) => {
       interestedProgramme: req.body.interestedProgramme,
       schoolName: req.body.schoolName,
       qualificationType: req.body.qualificationType,
-      selectapplicant: req.body.selectUniversity,
+      selectUniversity: req.body.selectUniversity,
       completionLetter: req.body.completionLetter,
       programmeLevel: req.body.programmeLevel,
       healthForm: req.body.healthForm,
@@ -96,29 +101,28 @@ exports.createApplicant = async (req, res, next) => {
       var template = handlebars.compile(html);
       var replacements = {
         usercode: "1234",
+        name: req.body.fullName
       };
       // res.json({ body: __dirname });
       var htmlToSend = template(replacements);
-      var mailOptions = {
-        from: "anton.david0017@email.com",
-        to: req.body.email,
-        subject: "Verify Email",
-        html: htmlToSend,
-      };
 
-      transporter.sendMail(mailOptions, function (error, info) {
+      const mailOptions = {
+        from: "Parasol Finance <no-reply@parasol.finance>", // sender email
+        to: req.body.email, // receiver email or list of receiver
+        subject: "Welcome to QETC", // Subject line
+        text: "", // plaintext body
+        html: htmlToSend, // html body
+      };
+      
+      // send mail with defined transport object
+      transport.sendMail(mailOptions, function (error) {
         if (error) {
-          return res.status(201).send({
-            status: "201",
-            msg: error,
-          });
+          console.log(error);
+          res.status(400).json({ success: false });
         } else {
-          // db.query(sql_query);
-          // return res.status(200).send({
-          //   status: '200',
-          //   msg: 'sent code.'
-          // });
-          console.log("success sent code");
+          console.log("Message sent: " + res.message);
+          res.status(200).json({ success: true });
+
         }
       });
     });
@@ -391,7 +395,7 @@ exports.delete = async (req, res, next) => {
       });
       const applicant = await Applicants.destroy({ where: { id: id } });
 
-// <<<<< dawnsee
+      // <<<<< dawnsee
       await Activity.create({
         action: "applicant deleted",
         name: req.body.Uname,
@@ -399,7 +403,7 @@ exports.delete = async (req, res, next) => {
       });
       /*
 =======
-      await Activity.create({ action: "applicant deleted", name: "superAdmin", role: "samon" });
+      await Activity.create({ action: "applicant deleted", name: "samon", role: "superAdmin" });
 >>> backend*/
 
       if (applicant)

@@ -29,8 +29,9 @@ exports.create = async (req, res, next) => {
     console.log("universityId", university.dataValues.id);
     console.log("campuss", req.body.campuses);
 
-    const newArr = JSON.parse(req.body.campuses);
-    const mappedArr = newArr.map(async (ele, ind) => {
+    let newArr = JSON.parse(req.body.campuses);
+    await newArr.map(async (ele, ind) => {
+      // await callAsynchronousOperation(item);
       let campus = {
         name: ele.name,
         address1: ele.address1,
@@ -40,14 +41,44 @@ exports.create = async (req, res, next) => {
         isMain: ele.isMain,
         UniversityId: university.dataValues.id,
       };
-      campus = await Campus.create(campus);
+      await Campus.create(campus);
     });
+    
+    // for(var i = 0; i < newArr.length; i++) {
+    //   let campus = {
+    //     name: newArr[i].name,
+    //     address1: newArr[i].address1,
+    //     address2: newArr[i].address2,
+    //     phone: newArr[i].phone,
+    //     email: newArr[i].email,
+    //     UniversityId: university.dataValues.id,
+    //   };
+    //   await Campus.create(campus);
+    // }
+    // let length = newArr.length;
+    // await Campus.create({
+    //   name: newArr[length-1].name,
+    //   address1: newArr[length-1].address1,
+    //   address2: newArr[length-1].address2,
+    //   phone: newArr[length-1].phone,
+    //   email: newArr[length-1].email,
+    //   isMain: newArr[length-1].isMain,
+    //   UniversityId: university.dataValues.id,
+    // });
+    // if(newArr[1]) {
+    //   Campus.create({
+    //     name: newArr[1].name,
+    //     address1: newArr[1].address1,
+    //     address2: newArr[1].address2,
+    //     phone: newArr[1].phone,
+    //     email: newArr[1].email,
+    //     isMain: newArr[1].isMain,
+    //     UniversityId: university.dataValues.id,
+    //   });
+    // }
+    
 
-    await Activity.create({
-      action: "New University Created",
-      name: req.body.Uname,
-      role: req.body.role,
-    });
+    await Activity.create({ action: "New University Created", name: req.body.Uname, role: req.body.role });
     return res.send({
       success: true,
       data: university,
@@ -137,33 +168,44 @@ exports.edit = async (req, res, next) => {
     const newArr = JSON.parse(req.body.campuses);
     console.log(payload, newArr);
     const mappedArr = newArr.map(async (ele, ind) => {
-      let campus = {
-        name: ele.name,
-        address1: ele.address1,
-        address2: ele.address2,
-        phone: ele.phone,
-        email: ele.email,
-        isMain: ele.isMain,
-        UniversityId: payload.id,
-      };
-      console.log("campssssssssa", campus);
-      campus = await Campus.update(
-        // Values to update
-        campus,
-        {
-          // Clause
-          where: {
-            id: ele.id,
-          },
-        }
-      );
-    });
+      if(!ele.id) {
+        let campus = {
+          name: ele.name,
+          address1: ele.address1,
+          address2: ele.address2,
+          phone: ele.phone,
+          email: ele.email,
+          isMain: ele.isMain,
+          UniversityId: payload.id,
+        };
+        await Campus.create(campus);
+      } else {
+        let campus = {
+          name: ele.name,
+          address1: ele.address1,
+          address2: ele.address2,
+          phone: ele.phone,
+          email: ele.email,
+          isMain: ele.isMain,
+          UniversityId: payload.id,
+        };
+        
+        console.log("campssssssssa", campus);
+        campus = await Campus.update(
+          // Values to update
+          campus,
+          {
+            // Clause
+            where: {
+              id: ele.id,
+            },
+          }
+        );
+      }
+      });
+      
 
-    await Activity.create({
-      action: "University updated",
-      name: req.body.Uname,
-      role: req.body.role,
-    });
+    await Activity.create({ action: "University updated", name: req.body.Uname, role: req.body.role });
     return res.send({
       success: true,
       message: "University updated successfully",

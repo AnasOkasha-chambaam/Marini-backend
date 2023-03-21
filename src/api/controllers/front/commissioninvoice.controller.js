@@ -23,9 +23,9 @@ exports.create = async (req, res, next) => {
       itemdate: req.body?.itemdate || Date.now(),
       recipient: req.body?.recipient,
       email: req.body?.email,
-      service: req.body?.service,
-      amount: req.body?.amount,
-      price: req.body?.price,
+      service: req.body?.service || "Vps",
+      amount: req.body?.amount || "0",
+      price: req.body?.price || "0",
       statusID: +req.body?.statusID,
       universityID: +req.body?.universityID,
       branchID: +req.body?.branchID,
@@ -45,7 +45,7 @@ exports.create = async (req, res, next) => {
     return res.json({
       success: true,
       data: commissionInvoice,
-      // Activity,
+      // Activity, 
       message: "commissionInvoice created successfully",
     });
   } catch (err) {

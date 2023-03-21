@@ -11,6 +11,7 @@ const port = 8080;
 models.sequelize.sync().then(function () {
   //   app.listen(port);
   http.createServer(app).listen(port);
+
 });
 
 app.on("request", (req, res) => {
@@ -21,7 +22,6 @@ app.on("request", (req, res) => {
   }
 });
 
-console.log(`servers is running on ${port}`);
 
 // http.createServer(app).listen(port);
 // console.log(`App is running on ${port}`);

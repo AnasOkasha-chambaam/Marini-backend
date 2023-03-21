@@ -90,7 +90,9 @@ exports.edit = async (req, res, next) => {
       const image = req?.file?.filename;
       payload[`image`] = image;
     }
-    payload.password = bcrypt.hashSync(req.body.password, 10);
+    if(payload.password) {
+      payload.password = bcrypt.hashSync(req.body.password, 10);
+    }
     const user = await Users.update(
       // Values to update
       payload,
@@ -212,12 +214,7 @@ exports.login = async (req, res) => {
       });
 
       return res.status(200).send({
-        //****         ...user */
-        id: user.id,
-        username: user.name,
-        email: user.email,
-        roles: user.role,
-        token: "Benear " + token,
+        ...user
       });
     } else {
       const lead = await Lead.findOne({
@@ -289,11 +286,7 @@ exports.signup = async (req, res) => {
 exports.signout = async (req, res) => {
   // Save User to Database
   try {
-    await Activity.create({
-      action: "User logged out",
-      name: req.body.name,
-      role: req.body.role,
-    });
+    await Activity.create({ action: "User logged out", name: req.body.name, role: req.body.role });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -302,7 +295,7 @@ exports.signout = async (req, res) => {
 exports.search = async (req, res, next) => {
   try {
     const user = await Users.findAndCountAll();
-    let { page, limit } = req.query;
+    let { page, limit} = req.query;
     let { name } = req.body;
     const filter = {};
 
@@ -344,7 +337,7 @@ exports.search = async (req, res, next) => {
   } catch (err) {
     res.send("User  Error " + err);
   }
-};
+}
 
 exports.getUser = async (req, res) => {
   try {
@@ -421,7 +414,9 @@ exports.getUser = async (req, res) => {
           message: "lead not found for given Id",
         });
     }
+
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
 };
+
