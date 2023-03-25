@@ -11,7 +11,7 @@ router
 router
   .route("/listInvoiceModuleStatuss")
   .get(controller.listInvoiceModuleStatuss);
-router.route("/edit").put(controller.edit);
+router.route("/edit").put(upload.any(), controller.edit);
 router.route("/delete").post(controller.delete);
 router.route("/get/:id").get(controller.get);
 // router.findAll();
