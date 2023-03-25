@@ -7,7 +7,7 @@ const multer = require("multer");
 const upload = multer();
 router.route("/create").post(upload.any(), controller.create);
 router.route("/list").get(controller.list);
-router.route(upload.any(), "/edit").put(controller.edit);
+router.route("/edit").put(upload.any(), controller.edit);
 router.route("/delete/:id").delete(controller.delete);
 router.route("/get/:id").get(controller.get);
 router.route("/search").post(controller.search);
